@@ -99,6 +99,12 @@ class PostViewSet(IsOwnerMixin, viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def me(self, request):
+        cache_key = f"user_posts_{request.user.id}"
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return Response(cached_data, status=status.HTTP_200_OK)
+
         posts = self.queryset.filter(user_id=request.user.id)
         serializer = self.get_serializer(posts, many=True)
+        cache.set(cache_key, serializer.data, timeout=60 * 5)  # 5 minutes
         return Response(serializer.data, status=status.HTTP_200_OK)
