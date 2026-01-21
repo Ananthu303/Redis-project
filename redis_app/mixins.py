@@ -7,5 +7,5 @@ class IsOwnerMixin:
         if self.action in ["update", "partial_update", "destroy"]:
             user = getattr(self.request, "user", None)
             if not user or obj.user_id != user.id:
-                raise PermissionDenied("You can only edit or delete your own object.")
+                raise PermissionDenied("You can only edit or delete your own post.")
         return obj
